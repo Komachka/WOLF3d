@@ -1,0 +1,38 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/nfs/2016/k/kstorozh/wolf/additional.c
+mlx.h
+-
+wolf.h
+/nfs/2016/k/kstorozh/wolf/wolf.h
+
+/nfs/2016/k/kstorozh/wolf/colour.c
+wolf.h
+/nfs/2016/k/kstorozh/wolf/wolf.h
+
+/nfs/2016/k/kstorozh/wolf/main.c
+mlx.h
+-
+math.h
+-
+stdlib.h
+-
+wolf.h
+/nfs/2016/k/kstorozh/wolf/wolf.h
+
+/nfs/2016/k/kstorozh/wolf/print.c
+wolf.h
+/nfs/2016/k/kstorozh/wolf/wolf.h
+
+/nfs/2016/k/kstorozh/wolf/wolf.h
+stdlib.h
+-
+math.h
+-
+
