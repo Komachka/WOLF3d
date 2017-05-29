@@ -5,11 +5,15 @@
 #ifndef WOLF3D_WOLF_H
 #define WOLF3D_WOLF_H
 
+#include "../minilibx/mlx.h"
 #include <stdlib.h>
 #include <math.h>
 
 #define mapWidth 24
 #define mapHeight 24
+
+extern void* mlx;
+extern void* win;
 
 
 typedef struct		s_print_struct

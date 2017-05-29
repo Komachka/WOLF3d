@@ -1,4 +1,4 @@
-/Applications/CLion.app/Contents/bin/cmake/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /nfs/2016/k/kstorozh/wolf
+/opt/clion-2017.1.2/bin/cmake/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/kateryna/WOLF3d
 -- Configuring done
 -- Generating done
--- Build files have been written to: /nfs/2016/k/kstorozh/wolf/cmake-build-debug
+-- Build files have been written to: /home/kateryna/WOLF3d/cmake-build-debug

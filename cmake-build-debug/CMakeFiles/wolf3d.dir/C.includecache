@@ -6,33 +6,39 @@
 
 #IncludeRegexTransform: 
 
-/nfs/2016/k/kstorozh/wolf/additional.c
-mlx.h
--
+/home/kateryna/WOLF3d/additional.c
 wolf.h
-/nfs/2016/k/kstorozh/wolf/wolf.h
+/home/kateryna/WOLF3d/wolf.h
 
-/nfs/2016/k/kstorozh/wolf/colour.c
+/home/kateryna/WOLF3d/colour.c
 wolf.h
-/nfs/2016/k/kstorozh/wolf/wolf.h
+/home/kateryna/WOLF3d/wolf.h
 
-/nfs/2016/k/kstorozh/wolf/main.c
-mlx.h
--
+/home/kateryna/WOLF3d/main.c
 math.h
 -
 stdlib.h
 -
 wolf.h
-/nfs/2016/k/kstorozh/wolf/wolf.h
+/home/kateryna/WOLF3d/wolf.h
+stdio.h
+-
+unistd.h
+-
 
-/nfs/2016/k/kstorozh/wolf/print.c
+/home/kateryna/WOLF3d/print.c
+stdio.h
+-
 wolf.h
-/nfs/2016/k/kstorozh/wolf/wolf.h
+/home/kateryna/WOLF3d/wolf.h
 
-/nfs/2016/k/kstorozh/wolf/wolf.h
+/home/kateryna/WOLF3d/wolf.h
+../minilibx/mlx.h
+/home/kateryna/minilibx/mlx.h
 stdlib.h
 -
 math.h
 -
+
+/home/kateryna/minilibx/mlx.h
 
