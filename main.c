@@ -140,20 +140,20 @@ void draw(t_params *params)
         if (rayDirX < 0) {
             stepX = -1;
             sideDistX = (rayPosX - mapX) * deltaDistX;
-            side_c = 1;
+            //side_c = 1;
         } else {
             stepX = 1;
             sideDistX = (mapX + 1.0 - rayPosX) * deltaDistX;
-            side_c = 2;
+            //side_c = 2;
         }
         if (rayDirY < 0) {
             stepY = -1;
             sideDistY = (rayPosY - mapY) * deltaDistY;
-            side_c = 3;
+            //side_c = 3;
         } else {
             stepY = 1;
             sideDistY = (mapY + 1.0 - rayPosY) * deltaDistY;
-            side_c = 4;
+            //side_c = 4;
         }
         //perform DDA
 
@@ -239,6 +239,7 @@ void draw(t_params *params)
 
 
 
+/*
 
         if (side_c == 1)
             color = 0xFF0000;
@@ -248,6 +249,7 @@ void draw(t_params *params)
             color = 0x0000FF;
         else
             color = 0xFFFFFF;
+*/
 
         verLine(x, drawStart, drawEnd, color);
     }
