@@ -14,8 +14,10 @@
 #define mapWidth 24
 #define mapHeight 24
 
-#define SCREN_WIGHT 632 //512
-#define SCREN_HEIGHT 504 // 384
+#define SCREN_WIGHT 1024 //512
+//#define SCREN_WIGHT 632 //512
+#define SCREN_HEIGHT 1024 // 384
+//#define SCREN_HEIGHT 504 // 384
 
 
 
@@ -157,16 +159,26 @@ void draw(t_params *params)
         }
         //perform DDA
 
-
+        side_c = 0;
         while (hit == 0) {
             //jump to next map square, OR in x-direction, OR in y-direction
             if (sideDistX < sideDistY) {
                 sideDistX += deltaDistX;
                 mapX += stepX;
+                if (stepX > 0)
+                    side_c = 1; ////
+                if (stepX < 0)
+                    side_c = 2; ////
                 side = 0;
             } else {
                 sideDistY += deltaDistY;
                 mapY += stepY;
+
+                if (stepY > 0)
+                    side_c = 3; ////
+                if (stepY < 0)
+                    side_c = 4; ////
+
                 side = 1;
             }
             //Check if ray has hit a wall
@@ -239,7 +251,6 @@ void draw(t_params *params)
 
 
 
-/*
 
         if (side_c == 1)
             color = 0xFF0000;
@@ -247,9 +258,8 @@ void draw(t_params *params)
             color = 0x00FF00;
         if (side_c == 3)
             color = 0x0000FF;
-        else
-            color = 0xFFFFFF;
-*/
+        if (side_c == 4)
+            color = 0xFFFF00; // good
 
         verLine(x, drawStart, drawEnd, color);
     }
