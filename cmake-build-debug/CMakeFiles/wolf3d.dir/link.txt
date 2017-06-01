@@ -1,1 +1,0 @@
-/usr/bin/cc   -lXext -lX11 -lm -g   CMakeFiles/wolf3d.dir/main.c.o CMakeFiles/wolf3d.dir/colour.c.o CMakeFiles/wolf3d.dir/print.c.o CMakeFiles/wolf3d.dir/additional.c.o  -o wolf3d ../../minilibx/libmlx_Linux.a 
