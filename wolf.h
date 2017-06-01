@@ -5,11 +5,20 @@
 #ifndef WOLF3D_WOLF_H
 #define WOLF3D_WOLF_H
 
+#include <mlx.h>
 #include <stdlib.h>
 #include <math.h>
 
+#define UP 126
+#define DOWN 125
+#define RIGHT 124
+#define LEFT 123
+
 #define mapWidth 24
 #define mapHeight 24
+
+extern void* mlx;
+extern void* window;
 
 
 typedef struct		s_print_struct

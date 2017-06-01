@@ -10,7 +10,9 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <stdio.h>
 #include "wolf.h"
+#include <mlx.h>
 
 void			make_img_line(t_point *p1, t_point *p2, t_img *imege)
 {
@@ -79,6 +81,8 @@ void			print_img_line(t_print_struct *p_s, t_img *img, float t, int x)
 	del_arrey((void **)matrix_colour, 3);
 }
 
+
+/*
 int				put_pixel_to_image(t_point *p, t_img *image)
 {
 	int		col;
@@ -103,3 +107,32 @@ int				put_pixel_to_image(t_point *p, t_img *image)
 	map[k] = (unsigned char)(col >> 16 & 0xFF);
 	return (0);
 }
+*/
+
+int				put_pixel_to_image(t_point *p, t_img *image)
+{
+	int		col;
+	int		k;
+	char	*map;
+	int		size_line;
+
+	image = (t_img*)malloc(sizeof(t_img));
+    //col = 0xFFFF00;
+	mlx_pixel_put(mlx, window, (int)p->x, (int)p->y, p->colour);
+    //map = image->map;
+	//size_line = image->size_line;
+	//if (p->x >= mapWidth || p->y >= mapHeight || p->x < 0 || p->y < 0)
+	//	return (-1);
+	//k = (int)(ceil(p->y) * size_line + ceil(p->x) * 4);
+	//if (k >= mapHeight * size_line * 4 - 1)
+	//	return (-1);
+	//else if (k < 0)
+	//	return (-1);
+	//map[k] = (unsigned char)(col & 0xFF);
+	//k++;
+	//map[k] = (unsigned char)(col >> 8 & 0xFF);
+	//k++;
+	//map[k] = (unsigned char)(col >> 16 & 0xFF);
+	return (0);
+}
+
