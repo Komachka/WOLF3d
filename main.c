@@ -171,8 +171,7 @@ void draw(t_params *params)
                 side = 1;
             }
             //Check if ray has hit a wall
-            if (worldMap[mapX][mapY] > 0) hit = 1;
-        }
+            if (worldMap[mapX][mapY] > 0)
 
         //Calculate distance projected on camera direction (oblique distance will give fisheye effect!)
         if (side == 0)

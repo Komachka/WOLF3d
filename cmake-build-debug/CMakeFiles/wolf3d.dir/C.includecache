@@ -7,8 +7,6 @@
 #IncludeRegexTransform: 
 
 /nfs/2016/k/kstorozh/wolf/additional.c
-mlx.h
--
 wolf.h
 /nfs/2016/k/kstorozh/wolf/wolf.h
 
@@ -17,20 +15,30 @@ wolf.h
 /nfs/2016/k/kstorozh/wolf/wolf.h
 
 /nfs/2016/k/kstorozh/wolf/main.c
-mlx.h
--
+wolf.h
+/nfs/2016/k/kstorozh/wolf/wolf.h
 math.h
 -
 stdlib.h
 -
 wolf.h
 /nfs/2016/k/kstorozh/wolf/wolf.h
+stdio.h
+-
+unistd.h
+-
 
 /nfs/2016/k/kstorozh/wolf/print.c
+stdio.h
+-
 wolf.h
 /nfs/2016/k/kstorozh/wolf/wolf.h
+mlx.h
+-
 
 /nfs/2016/k/kstorozh/wolf/wolf.h
+mlx.h
+-
 stdlib.h
 -
 math.h
