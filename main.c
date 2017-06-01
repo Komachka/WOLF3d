@@ -74,6 +74,8 @@ int my_key_funk(int keykode, t_params *params);
 
 void draw(t_params *params);
 
+void draw_flor(t_params *params);
+
 int main(void)
 {
 
@@ -96,12 +98,34 @@ int main(void)
     params->dirX = dirX;
     params->dirY = dirY;
 
+    draw_flor(params);
     draw(params);
+
     mlx_key_hook(window, my_key_funk, params);
     mlx_loop(mlx);
     return (0);
 }
 
+void draw_flor(t_params *params)
+{
+    int i;
+
+
+    /*double cameraX = 2 * x / (double) SCREN_WIGHT - 1; //x-coordinate in camera space
+    double rayDirY = params->dirY + params->planeY * cameraX;
+    */
+    i = SCREN_HEIGHT/2;
+    int y = 0;
+    while (i < SCREN_HEIGHT)
+    {
+        y = 0;
+        while(y < SCREN_WIGHT) {
+            mlx_pixel_put(mlx, window, y, i, 0x707270);
+            y++;
+        }
+        i++;
+    }
+}
 
 
 void draw(t_params *params)
@@ -311,6 +335,7 @@ int my_key_funk(int keykode, t_params *params)
         params->planeX = params->planeX * cos(-params->rotSpeed) - params->planeY * sin(-params->rotSpeed);
         params->planeY = oldPlaneX * sin(-params->rotSpeed) + params->planeY * cos(-params->rotSpeed);
         mlx_clear_window(mlx, window);
+        draw_flor(params);
         draw(params);
     }
     if (keykode == LEFT)
@@ -322,6 +347,7 @@ int my_key_funk(int keykode, t_params *params)
         params->planeX = params->planeX * cos(params->rotSpeed) - params->planeY * sin(params->rotSpeed);
         params->planeY = oldPlaneX * sin(params->rotSpeed) + params->planeY * cos(params->rotSpeed);
         mlx_clear_window(mlx, window);
+        draw_flor(params);
         draw(params);
     }
 
@@ -332,6 +358,7 @@ int my_key_funk(int keykode, t_params *params)
         if( worldMap[(int)(params->posX)][(int)(params->posY + params->dirY * params->moveSpeed)] == 0)
             params->posY += params->dirY * params->moveSpeed;
         mlx_clear_window(mlx, window);
+        draw_flor(params);
         draw(params);
     }
     if (keykode == DOWN)
@@ -341,6 +368,7 @@ int my_key_funk(int keykode, t_params *params)
         if(worldMap[(int)(params->posX)][(int)(params->posY - params->dirY * params->moveSpeed)] == 0)
             params->posY -= params->dirY * params->moveSpeed;
         mlx_clear_window(mlx, window);
+        draw_flor(params);
         draw(params);
     }
     return (0);
