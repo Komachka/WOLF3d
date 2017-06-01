@@ -106,7 +106,6 @@ void draw(t_params *params)
 {
     double time = 0; //time of current frame
     double oldTime = 0; //time of previous frame
-    int side_c = 0;
     for (int x = 0; x < SCREN_WIGHT; x++) {
         //calculate ray position and direction
         double cameraX = 2 * x / (double) SCREN_WIGHT - 1; //x-coordinate in camera space
@@ -137,7 +136,7 @@ void draw(t_params *params)
         //calculate step and initial sideDist
 
 
-
+        int side_c = 0;
         if (rayDirX < 0) {
             stepX = -1;
             sideDistX = (rayPosX - mapX) * deltaDistX;
@@ -171,7 +170,8 @@ void draw(t_params *params)
                 side = 1;
             }
             //Check if ray has hit a wall
-            if (worldMap[mapX][mapY] > 0)
+            if (worldMap[mapX][mapY] > 0) hit = 1;
+        }
 
         //Calculate distance projected on camera direction (oblique distance will give fisheye effect!)
         if (side == 0)
