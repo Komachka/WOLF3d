@@ -9,17 +9,38 @@
 #include <stdlib.h>
 #include <math.h>
 
+
+/*
 #define UP 126
 #define DOWN 125
 #define RIGHT 124
 #define LEFT 123
+*/
+
+//linux
+#define UP 65362
+#define DOWN 65364
+#define LEFT 65361
+#define RIGHT 65363
 
 #define mapWidth 24
 #define mapHeight 24
 
+
+#define SCREN_WIGHT 1024 //512
+//#define SCREN_WIGHT 632 //512
+#define SCREN_HEIGHT 1024 // 384
+//#define SCREN_HEIGHT 504 // 384
 extern void* mlx;
 extern void* window;
 
+typedef struct s_vline
+{
+    int x;
+    int start;
+    int end;
+    int colour;
+}t_vline;
 
 typedef struct		s_print_struct
 {
@@ -34,21 +55,9 @@ typedef struct		s_print_struct
 
 typedef struct		s_i
 {
-    void			*img;
+    void			*img_mlx;
     char			*map;
     int				size_line;
-    double			scale;
-    double			zoom;
-    double			move_x;
-    double			move_y;
-    double			iterations;
-    double			a;
-    double			size;
-    double			c_rial;
-    double			c_imegian;
-    double			alpha;
-    double			beta;
-    int				season;
 }					t_img;
 
 typedef struct

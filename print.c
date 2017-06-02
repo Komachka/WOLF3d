@@ -82,7 +82,6 @@ void			print_img_line(t_print_struct *p_s, t_img *img, float t, int x)
 }
 
 
-/*
 int				put_pixel_to_image(t_point *p, t_img *image)
 {
 	int		col;
@@ -90,13 +89,16 @@ int				put_pixel_to_image(t_point *p, t_img *image)
 	char	*map;
 	int		size_line;
 
+
 	col = p->colour;
 	map = image->map;
 	size_line = image->size_line;
-	if (p->x >= mapWidth || p->y >= mapHeight || p->x < 0 || p->y < 0)
+	if (p->x >= SCREN_WIGHT || p->y >= SCREN_HEIGHT || p->x < 0 || p->y < 0) {
+		//printf("p->x >= mapWidth || p->y >= mapHeight || p->x < 0 || p->y < 0");
 		return (-1);
-	k = (int)(ceil(p->y) * size_line + ceil(p->x) * 4);
-	if (k >= mapHeight * size_line * 4 - 1)
+	}
+		k = (int)(ceil(p->y) * size_line + ceil(p->x) * 4);
+	if (k >= SCREN_HEIGHT * size_line * 4 - 1)
 		return (-1);
 	else if (k < 0)
 		return (-1);
@@ -105,9 +107,10 @@ int				put_pixel_to_image(t_point *p, t_img *image)
 	map[k] = (unsigned char)(col >> 8 & 0xFF);
 	k++;
 	map[k] = (unsigned char)(col >> 16 & 0xFF);
+	//printf("k = %d\n", k);
 	return (0);
 }
-*/
+/*
 
 int				put_pixel_to_image(t_point *p, t_img *image)
 {
@@ -136,3 +139,4 @@ int				put_pixel_to_image(t_point *p, t_img *image)
 	return (0);
 }
 
+*/

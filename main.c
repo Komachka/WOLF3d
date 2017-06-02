@@ -3,21 +3,8 @@
 //
 
 #include "wolf.h"
-#include <math.h>
-#include <stdlib.h>
-#include "wolf.h"
+#include "../minilibx/mlx.h"
 
-
-#include <stdio.h>
-#include <unistd.h>
-
-#define mapWidth 24
-#define mapHeight 24
-
-#define SCREN_WIGHT 1024 //512
-//#define SCREN_WIGHT 632 //512
-#define SCREN_HEIGHT 1024 // 384
-//#define SCREN_HEIGHT 504 // 384
 
 
 
@@ -69,12 +56,14 @@ int worldMap[mapWidth][mapHeight] =
 
 void *mlx;
 void *window;
-void verLine(int x, int start, int anEnd, int color);
+//void verLine(int x, int start, int anEnd, int color);
 int my_key_funk(int keykode, t_params *params);
 
 void draw(t_params *params);
 
 void draw_flor(t_params *params);
+
+void verLine(t_vline vline, t_img *img);
 
 int main(void)
 {
@@ -90,6 +79,12 @@ int main(void)
 
     mlx = mlx_init();
     window = mlx_new_window(mlx, SCREN_WIGHT, SCREN_HEIGHT, "WOLF3D");
+    t_img *img_stuct;
+    img_stuct = (t_img*)malloc(sizeof(t_img));
+    void *img_mlx;
+    img_mlx = mlx_new_image(mlx, SCREN_WIGHT, SCREN_HEIGHT);
+    create_img(img_stuct, img_mlx);
+
 
     params->posX = posX;
     params->posY = posY;
@@ -98,14 +93,18 @@ int main(void)
     params->dirX = dirX;
     params->dirY = dirY;
 
+    params->img= img_stuct;
     draw_flor(params);
     draw(params);
+
+   mlx_put_image_to_window(mlx, window, img_mlx, 0, 0);
 
     mlx_key_hook(window, my_key_funk, params);
     mlx_loop(mlx);
     return (0);
 }
 
+#include <stdio.h>
 void draw_flor(t_params *params)
 {
     int i;
@@ -114,13 +113,21 @@ void draw_flor(t_params *params)
     /*double cameraX = 2 * x / (double) SCREN_WIGHT - 1; //x-coordinate in camera space
     double rayDirY = params->dirY + params->planeY * cameraX;
     */
+    t_point *p;
+
+    p = (t_point*)malloc(sizeof(t_point));
     i = SCREN_HEIGHT/2;
     int y = 0;
     while (i < SCREN_HEIGHT)
     {
         y = 0;
         while(y < SCREN_WIGHT) {
-            mlx_pixel_put(mlx, window, y, i, 0x707270);
+            p->x = y;
+            p->y = i;
+            p->colour = 0x707270;
+
+            put_pixel_to_image(p, params->img);
+            //mlx_pixel_put(mlx, window, y, i, 0x707270);
             y++;
         }
         i++;
@@ -270,12 +277,7 @@ void draw(t_params *params)
         }*/
         if (side == 1)
             color = 0x00FFFF;
-
         //draw the pixels of the stripe as a vertical line
-
-
-
-
         if (side_c == 1)
             color = 0xFF0000;
         if (side_c == 2)
@@ -284,8 +286,13 @@ void draw(t_params *params)
             color = 0x0000FF;
         if (side_c == 4)
             color = 0xFFFF00; // good
-
-        verLine(x, drawStart, drawEnd, color);
+        t_vline line;
+        line.x = x;
+        line.start = drawStart;
+        line.end = drawEnd;
+        line.colour = color;
+        verLine(line, params->img);
+        //verLine(x, drawStart, drawEnd, color);
     }
 
     //timing for input and FPS counter
@@ -303,11 +310,29 @@ void draw(t_params *params)
     params->rotSpeed = rotSpeed;
 }
 
-void verLine(int x, int start, int anEnd, int color)
+void verLine(t_vline vline, t_img *img) {
+    t_point *p1;
+    t_point *p2;
+
+    p1 = (t_point*)malloc(sizeof(t_point));
+    p2 = (t_point*)malloc(sizeof(t_point));
+    p1->colour =vline.colour;
+    p2->colour =vline.colour;
+    p1->x = vline.x;
+    p2->x = vline.x;
+    p1->y = vline.start;
+    p2->y = vline.end;
+
+    make_img_line(p1, p2, img);
+    free(p1);
+    free(p2);
+}
+
+/*void verLine(int x, int start, int anEnd, int color)
 {
     t_point *p1;
     t_point *p2;
-    t_img *img;
+    t_img *img_mlx;
 
     p1 = (t_point*)malloc(sizeof(t_point));
     p2 = (t_point*)malloc(sizeof(t_point));
@@ -318,8 +343,10 @@ void verLine(int x, int start, int anEnd, int color)
     p1->y = start;
     p2->y = anEnd;
 
-    make_img_line(p1, p2, img);
-}
+    make_img_line(p1, p2, img_mlx);
+    free(p1);
+    free(p2);
+}*/
 
 int my_key_funk(int keykode, t_params *params)
 {
@@ -334,9 +361,15 @@ int my_key_funk(int keykode, t_params *params)
         double oldPlaneX = params->planeX;
         params->planeX = params->planeX * cos(-params->rotSpeed) - params->planeY * sin(-params->rotSpeed);
         params->planeY = oldPlaneX * sin(-params->rotSpeed) + params->planeY * cos(-params->rotSpeed);
-        mlx_clear_window(mlx, window);
+
+        //mlx_clear_window(mlx, window);
+        mlx_destroy_image(mlx, params->img->img_mlx);
+        void *img_mlx = mlx_new_image(mlx, SCREN_WIGHT, SCREN_HEIGHT);
+        params->img->img_mlx = img_mlx;
+        create_img(params->img, params->img->img_mlx);
         draw_flor(params);
         draw(params);
+        mlx_put_image_to_window(mlx, window, img_mlx, 0, 0);
     }
     if (keykode == LEFT)
     {
@@ -346,8 +379,17 @@ int my_key_funk(int keykode, t_params *params)
         double oldPlaneX = params->planeX;
         params->planeX = params->planeX * cos(params->rotSpeed) - params->planeY * sin(params->rotSpeed);
         params->planeY = oldPlaneX * sin(params->rotSpeed) + params->planeY * cos(params->rotSpeed);
-        mlx_clear_window(mlx, window);
+
+        mlx_destroy_image(mlx, params->img->img_mlx);
+        params->img->img_mlx = mlx_new_image(mlx, SCREN_WIGHT, SCREN_HEIGHT);
+        create_img(params->img, params->img->img_mlx);
         draw_flor(params);
+        draw(params);
+        mlx_put_image_to_window(mlx, window, params->img->img_mlx, 0, 0);
+
+
+        //mlx_clear_window(mlx, window);
+        //draw_flor(params);
         draw(params);
     }
 
@@ -357,9 +399,19 @@ int my_key_funk(int keykode, t_params *params)
             params->posX += params->dirX * params->moveSpeed;
         if( worldMap[(int)(params->posX)][(int)(params->posY + params->dirY * params->moveSpeed)] == 0)
             params->posY += params->dirY * params->moveSpeed;
-        mlx_clear_window(mlx, window);
+
+
+        mlx_destroy_image(mlx, params->img->img_mlx);
+        params->img->img_mlx = mlx_new_image(mlx, SCREN_WIGHT, SCREN_HEIGHT);
+        create_img(params->img, params->img->img_mlx);
         draw_flor(params);
         draw(params);
+        mlx_put_image_to_window(mlx, window, params->img->img_mlx, 0, 0);
+
+
+        //mlx_clear_window(mlx, window);
+        //draw_flor(params);
+        //draw(params);
     }
     if (keykode == DOWN)
     {
@@ -367,9 +419,17 @@ int my_key_funk(int keykode, t_params *params)
             params->posX -= params->dirX * params->moveSpeed;
         if(worldMap[(int)(params->posX)][(int)(params->posY - params->dirY * params->moveSpeed)] == 0)
             params->posY -= params->dirY * params->moveSpeed;
-        mlx_clear_window(mlx, window);
+
+        mlx_destroy_image(mlx, params->img->img_mlx);
+        params->img->img_mlx = mlx_new_image(mlx, SCREN_WIGHT, SCREN_HEIGHT);
+        create_img(params->img, params->img->img_mlx);
         draw_flor(params);
         draw(params);
+        mlx_put_image_to_window(mlx, window, params->img->img_mlx, 0, 0);
+
+        //mlx_clear_window(mlx, window);
+        //draw_flor(params);
+        //draw(params);
     }
     return (0);
 }

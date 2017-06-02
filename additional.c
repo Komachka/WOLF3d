@@ -56,4 +56,5 @@ void	create_img(t_img *img_struct, void *img_mlx)
 	img_struct->map = mlx_get_data_addr(img_mlx, &bit_per_pixel,
 										&size_line, &endian);
 	img_struct->size_line = size_line;
+	img_struct->img_mlx = img_mlx;
 }
