@@ -6,7 +6,11 @@
 #include "../minilibx/mlx.h"
 
 
-
+#include <stdio.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>
 
 typedef struct s_params
 {
@@ -25,6 +29,7 @@ typedef struct s_params
     int **world_map;
 
 }t_params;
+/*
 
 int worldMap[mapWidth][mapHeight] =
         {
@@ -52,6 +57,7 @@ int worldMap[mapWidth][mapHeight] =
                 {1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
                 {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
         };
+*/
 
 
 void *mlx;
@@ -65,6 +71,10 @@ void draw_flor(t_params *params);
 
 void verLine(t_vline vline, t_img *img);
 
+
+void create_map(t_params *pParams);
+
+
 int main(void)
 {
 
@@ -76,6 +86,7 @@ int main(void)
     double planeX = 0, planeY = 0.66; //the 2d raycaster version of camera plane
 
 
+    create_map(params);
 
     mlx = mlx_init();
     window = mlx_new_window(mlx, SCREN_WIGHT, SCREN_HEIGHT, "WOLF3D");
@@ -104,7 +115,37 @@ int main(void)
     return (0);
 }
 
-#include <stdio.h>
+void create_map(t_params *pParams)
+{
+    int i = 0;
+    int j;
+    pParams->world_map = (int **)malloc(sizeof(int *) * mapHeight);
+    while (i < (int)mapHeight)
+    {
+        pParams->world_map[i] = (int*)malloc(sizeof(int) * mapWidth);
+        j = 0;
+        while(j < (int)mapWidth)
+        {
+            if(i == 0 || j == 0 || i == mapWidth - 1 || j == mapHeight - 1)
+                pParams->world_map[i][j] = 1;
+            else
+                pParams->world_map[i][j] = 0;
+            if (i * j == 5 || i * j ==  8 || i * j ==  13 || i * j == 21 || i * j == 34|| i * j == 55||
+                    i * j == 89 || i * j ==  144 || i * j == 233 || i * j ==  377)
+                pParams->world_map[i][j] = 1;
+            if ((i == 5 && j != 1) || (i == 5 && j != 2) || (i == 5 && j != 3) || ( i == 5 && j != 4) || ( i == 5 && j != 5))
+            pParams->world_map[i][j] = 1;
+            if (i%2 == 0 && j < mapWidth/2)
+                pParams->world_map[i][j] = 1;
+            j++;
+        }
+        i++;
+    }
+
+
+}
+
+
 void draw_flor(t_params *params)
 {
     int i;
@@ -137,6 +178,9 @@ void draw_flor(t_params *params)
 
 void draw(t_params *params)
 {
+    int **worldMap = params->world_map;
+
+
     double time = 0; //time of current frame
     double oldTime = 0; //time of previous frame
     for (int x = 0; x < SCREN_WIGHT; x++) {
@@ -297,7 +341,7 @@ void draw(t_params *params)
 
     //timing for input and FPS counter
     oldTime = time;
-    time = 30;
+    time = 50;
     double frameTime = (time - oldTime) / 1000.0; //frameTime is the time this frame has taken, in seconds
     //print(1.0 / frameTime); //FPS counter
     //redraw();
@@ -393,6 +437,7 @@ int my_key_funk(int keykode, t_params *params)
         draw(params);
     }
 
+    int **worldMap = params->world_map;
     if (keykode == UP)
     {
         if(worldMap[(int)(params->posX + params->dirX * params->moveSpeed)][(int)(params->posY)] == 0)
