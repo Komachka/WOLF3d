@@ -17,7 +17,13 @@ void verLine(t_vline vline, t_img *img);
 
 void create_base_params(t_params *params);
 
-int main(void)
+int get_wall_side_colour(int c);
+
+t_start_end_draw calc_start_and_end(double perp_wall_dist);
+
+t_rawcast calc_step_and_side_dist(t_rawcast *link_rawcast);
+
+        int main(void)
 {
 
     t_params *params;
@@ -95,28 +101,47 @@ void draw(t_params *params)
     int **worldMap;
 
     worldMap = params->world_map;
-    double time; //time of current frame
-    double oldTime; //time of previous frame
-    time = 0;
     for (int x = 0; x < SCREN_WIGHT; x++) {
         //calculate ray position and direction
         double cameraX = 2 * x / (double) SCREN_WIGHT - 1; //x-coordinate in camera space
-        double rayPosX = params->posX;
+
+        t_rawcast rawcast;
+        rawcast.rayPosX = params->posX;
+        rawcast.rayPosY = params->posY;
+        rawcast.rayDirX = params->dirX + params->planeX * cameraX;
+        rawcast.rayDirY = params->dirY + params->planeY * cameraX;
+        /*double rayPosX = params->posX;
         double rayPosY = params->posY;
         double rayDirX = params->dirX + params->planeX * cameraX;
-        double rayDirY = params->dirY + params->planeY * cameraX;
-
+        double rayDirY = params->dirY + params->planeY * cameraX;*/
         //which box of the map we're in
-        int mapX = (int) rayPosX;
-        int mapY = (int) rayPosY;
+
+        rawcast.mapX = (int) rawcast.rayPosX;
+        rawcast.mapY = (int) rawcast.rayPosY;
+
+        /*int mapX = (int) rayPosX;
+        int mapY = (int) rayPosY;*/
 
         //length of ray from current position to next x or y-side
         double sideDistX;
         double sideDistY;
 
+
+
+        int mapX = rawcast.mapX;
+        int mapY = rawcast.mapY;
+        double rayPosX = rawcast.rayPosX;
+        double rayPosY = rawcast.rayPosY;
+        double rayDirX = rawcast.rayDirX;
+        double rayDirY = rawcast.rayDirY;
+
         //length of ray from one x or y-side to next x or y-side
-        double deltaDistX = sqrt(1 + (rayDirY * rayDirY) / (rayDirX * rayDirX));
-        double deltaDistY = sqrt(1 + (rayDirX * rayDirX) / (rayDirY * rayDirY));
+        rawcast.deltaDistX = sqrt(1 + (rawcast.rayDirY * rawcast.rayDirY) / (rawcast.rayDirX * rawcast.rayDirX));
+        rawcast.deltaDistY = sqrt(1 + (rawcast.rayDirX * rawcast.rayDirX) / (rawcast.rayDirY * rawcast.rayDirY));
+
+        /*double deltaDistX = sqrt(1 + (rayDirY * rayDirY) / (rayDirX * rayDirX));
+        double deltaDistY = sqrt(1 + (rayDirX * rayDirX) / (rayDirY * rayDirY));*/
+
         double perpWallDist;
 
         //what direction to step in x or y-direction (either +1 or -1)
@@ -127,6 +152,26 @@ void draw(t_params *params)
         int side; //was a NS or a EW wall hit?
 
         //calculate step and initial sideDist
+
+        rawcast = calc_step_and_side_dist(&rawcast);
+   /*     if (rawcast.rayDirX < 0) {
+            stepX = -1;
+            sideDistX = (rawcast.rayPosX - rawcast.mapX) * rawcast.deltaDistX;
+        } else {
+            stepX = 1;
+            sideDistX = (rawcast.mapX + 1.0 - rawcast.rayPosX) * rawcast.deltaDistX;
+        }
+        if (rawcast.rayDirY < 0) {
+            stepY = -1;
+            sideDistY = (rawcast.rayPosY - rawcast.mapY) * rawcast.deltaDistY;
+        } else {
+            stepY = 1;
+            sideDistY = (rawcast.mapY + 1.0 - rawcast.rayPosY) * rawcast.deltaDistY;
+        }*/
+
+      /*  double deltaDistX = rawcast.deltaDistX;
+        double deltaDistY = rawcast.deltaDistY;
+
 
         if (rayDirX < 0) {
             stepX = -1;
@@ -141,9 +186,38 @@ void draw(t_params *params)
         } else {
             stepY = 1;
             sideDistY = (mapY + 1.0 - rayPosY) * deltaDistY;
-        }
+        }*/
         //perform DDA
 
+        int side_c = 0;
+        while (hit == 0)
+        {
+            //jump to next map square, OR in x-direction, OR in y-direction
+            if (rawcast.sideDistX < rawcast.sideDistY) {
+                rawcast.sideDistX += rawcast.deltaDistX;
+                rawcast.mapX += rawcast.stepX;
+                if (rawcast.stepX > 0)
+                    side_c = 1; ////
+                if (rawcast.stepX < 0)
+                    side_c = 2; ////
+            } else {
+                rawcast.sideDistY += rawcast.deltaDistY;
+                rawcast.mapY += rawcast.stepY;
+                if (rawcast.stepY > 0)
+                    side_c = 3; ////
+                if (rawcast.stepY < 0)
+                    side_c = 4; ////
+            }
+            //Check if ray has hit a wall
+            if (worldMap[rawcast.mapX][rawcast.mapY] > 0) hit = 1;
+        }
+
+
+        /*double deltaDistX = rawcast.deltaDistX;
+        double deltaDistY = rawcast.deltaDistY;
+        int mapX = rawcast.mapX;
+        int mapY = rawcast.mapY;*/
+/*
         int side_c = 0;
         while (hit == 0)
         {
@@ -155,7 +229,6 @@ void draw(t_params *params)
                     side_c = 1; ////
                 if (stepX < 0)
                     side_c = 2; ////
-                side = 0;
             } else {
                 sideDistY += deltaDistY;
                 mapY += stepY;
@@ -163,59 +236,105 @@ void draw(t_params *params)
                     side_c = 3; ////
                 if (stepY < 0)
                     side_c = 4; ////
-                side = 1;
             }
             //Check if ray has hit a wall
             if (worldMap[mapX][mapY] > 0) hit = 1;
-        }
+        }*/
 
         //Calculate distance projected on camera direction (oblique distance will give fisheye effect!)
-        if (side == 0)
+
+        if (side_c == 1 || side_c == 2)
+            perpWallDist = (rawcast.mapX - rawcast.rayPosX + (1 - rawcast.stepX) / 2) / rawcast.rayDirX;
+        else
+            perpWallDist = (rawcast.mapY - rawcast.rayPosY + (1 - rawcast.stepY) / 2) / rawcast.rayDirY;
+
+       /* double rayPosX = rawcast.rayPosX;
+        double rayPosY = rawcast.rayPosY;
+        double rayDirX = rawcast.rayDirX;
+        double rayDirY = rawcast.rayDirY;*/
+
+   /*     if (side_c == 1 || side_c == 2)
             perpWallDist = (mapX - rayPosX + (1 - stepX) / 2) / rayDirX;
         else
             perpWallDist = (mapY - rayPosY + (1 - stepY) / 2) / rayDirY;
 
-        //Calculate height of line to draw on screen
-        int lineHeight = (int) ((int)SCREN_HEIGHT / perpWallDist);
-        // hz
-        if (perpWallDist == 0)
-            lineHeight = 99999999;
-        //calculate lowest and highest pixel to fill in current stripe
-        int drawStart = -lineHeight / 2 + SCREN_HEIGHT / 2;
-        if (drawStart < 0)drawStart = 0;
-        int drawEnd = lineHeight / 2 + SCREN_HEIGHT / 2;
-        if (drawEnd >= SCREN_HEIGHT)
-            drawEnd = SCREN_HEIGHT - 1;
-
-        //choose wall color
+*/
 
 
-        int color;
 
-        if (side_c == 1)
-            color = 0xFF0000;
-        if (side_c == 2)
-            color = 0x00FF00;
-        if (side_c == 3)
-            color = 0x0000FF;
-        if (side_c == 4)
-            color = 0xFFFF00; // good
-        t_vline line;
+
+        t_start_end_draw start_end_draw; //
+        start_end_draw = calc_start_and_end(perpWallDist);
+        t_vline line; //
         line.x = x;
-        line.start = drawStart;
-        line.end = drawEnd;
-        line.colour = color;
+        line.start = start_end_draw.drawStart;
+        line.end = start_end_draw.drawEnd;
+        line.colour = get_wall_side_colour(side_c);
         verLine(line, params->img_struct);
-        //verLine(x, drawStart, drawEnd, color);
+
     }
 
     //timing for input and FPS counter
-    oldTime = time;
-    time = 50;
+
     double frameTime = 50 / 1000.0; //frameTime is the time this frame has taken, in seconds
     //speed modifiers
     params->moveSpeed = frameTime * 5.0; // //the constant value is in squares/second
     params->rotSpeed = frameTime * 3.0; //the constant value is in radians/second
+}
+
+t_rawcast calc_step_and_side_dist(t_rawcast *link_rawcast)
+{
+    t_rawcast rawcast;
+
+    rawcast = *link_rawcast;
+    if (rawcast.rayDirX < 0) {
+        rawcast.stepX = -1;
+        rawcast.sideDistX = (rawcast.rayPosX - rawcast.mapX) * rawcast.deltaDistX;
+    } else {
+        rawcast.stepX = 1;
+        rawcast.sideDistX = (rawcast.mapX + 1.0 - rawcast.rayPosX) * rawcast.deltaDistX;
+    }
+    if (rawcast.rayDirY < 0) {
+        rawcast.stepY = -1;
+        rawcast.sideDistY = (rawcast.rayPosY - rawcast.mapY) * rawcast.deltaDistY;
+    } else {
+        rawcast.stepY = 1;
+        rawcast.sideDistY = (rawcast.mapY + 1.0 - rawcast.rayPosY) * rawcast.deltaDistY;
+    }
+    return (rawcast);
+}
+
+t_start_end_draw calc_start_and_end(double perp_wall_dist) {
+    t_start_end_draw result;
+    int lineHeight;
+
+    //Calculate height of line to draw on screen
+    lineHeight = (int) ((int)SCREN_HEIGHT / perp_wall_dist);
+    if (perp_wall_dist == 0)
+        lineHeight = 99999999;
+    //calculate lowest and highest pixel to fill in current stripe
+    result.drawStart = -lineHeight / 2 + SCREN_HEIGHT / 2;
+    if (result.drawStart < 0)
+        result.drawStart = 0;
+    result.drawEnd = lineHeight / 2 + SCREN_HEIGHT / 2;
+    if (result.drawEnd >= SCREN_HEIGHT)
+        result.drawEnd = SCREN_HEIGHT - 1;
+    return (result);
+}
+
+int get_wall_side_colour(int side_c) {
+    //choose wall color
+    int color;
+
+    if (side_c == 1)
+        color = 0xFF0000;
+    if (side_c == 2)
+        color = 0x00FF00;
+    if (side_c == 3)
+        color = 0x0000FF;
+    if (side_c == 4)
+        color = 0xFFFF00; // good
+    return (color);
 }
 
 void verLine(t_vline vline, t_img *img) {
