@@ -40,19 +40,19 @@
 typedef struct s_rawcast
 {
 
-    double rayPosX;
-    double rayPosY;
-    double rayDirX;
-    double rayDirY;
-    int mapX;
-    int mapY;
-    double sideDistX;
-    double sideDistY;
-    double deltaDistX;
-    double deltaDistY;
-    double perpWallDist;
-    int stepX;
-    int stepY;
+    double ray_p_x;
+    double ray_p_y;
+    double ray_d_x;
+    double ray_d_y;
+    int map_x;
+    int map_y;
+    double side_dist_x;
+    double side_dist_y;
+    double d_dist_x;
+    double d_dist_y;
+    double perp_wall;
+    int step_x;
+    int step_y;
     int side_c;
 } t_rawcast;
 
@@ -60,8 +60,8 @@ typedef struct s_rawcast
 
 typedef struct s_start_end_draw
 {
-    int drawStart;
-    int drawEnd;
+    int start_point;
+    int end_point;
 }t_start_end_draw;
 
 typedef struct s_vline
@@ -90,40 +90,58 @@ typedef struct		s_i
     int				size_line;
 }					t_img;
 
-typedef struct
+typedef struct      s_point
 {
     double			x;
     double			y;
     int				colour;
 }					t_point;
 
-typedef struct
+typedef struct      s_params
 {
-    double			r;
-    double			g;
-    double			b;
-}					t_rgb;
-
-typedef struct s_params
-{
-    void *mlx;
-    t_img *img_struct;
-    void *window;
-
-    double dirX;
-    double dirY;
-    double rotSpeed;
-    double planeX;
-    double planeY;
-    double moveSpeed;
-    double posX;
-    double posY;
-    int **world_map;
+    void            *mlx;
+    t_img           *img_struct;
+    void            *window;
+    double          dir_x;
+    double          dir_y;
+    double          rot_speed;
+    double          plane_x;
+    double          plane_y;
+    double          move_speed;
+    double          pos_x;
+    double          pos_y;
+    int             **map;
 
 }t_params;
 
-void draw(t_params *params);
-void draw_flor(t_params *params);
+/*
+** main.c
+*/
+
+void    create_base_params(t_params *params);
+void    draw_flor(t_params *params);
+void    draw(t_params *params);
+int     get_wall_side_colour(int side_c);
+
+
+/*
+** rawcast_calc.c
+*/
+
+t_rawcast   calc_dist_projection_on_camera_dir(t_rawcast *link_rc);
+t_rawcast   calc_par_rc(t_params *pr, t_rawcast *link_rc, int x);
+t_rawcast   perform_dda(t_rawcast *l_rc, int **map);
+t_rawcast   calc_step_and_side_dist(t_rawcast *link_rc);
+t_start_end_draw    calc_start_and_end(double perp_wall_dist);
+
+/*
+**	key_funk.c
+*/
+int my_key_funk(int kkode, t_params *par);
+void rorate(t_params *par, double speed, int kkode);
+void move_frame(t_params *par, double dir_x, double dir_y, int kkode);
+void rorate(t_params *par, double speed, int kkode);
+int exit_x(void *par);
 
 /*
 **	print.c
@@ -134,6 +152,7 @@ t_print_struct		*create_print_stuff(t_point *p1, t_point *p2);
 void				print_img_line(t_print_struct *p_s,
                                    t_img *img, float t, int x);
 int					put_pixel_to_image(t_point *p, t_img *image);
+void                verLine(t_vline vline, t_img *img);
 
 
 /*
@@ -157,6 +176,7 @@ void				swap(double *x1, double *x2);
 double				to_radians(double degrees);
 int					what_fractal_is_it(char c);
 void	            create_img(t_img *img_struct, void *img_mlx);
+void free_map(int **map);
 
 /*
 **	map.c

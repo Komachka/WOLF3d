@@ -13,8 +13,6 @@
 
 #include "wolf.h"
 
-
-
 void	del_arrey(void **arrey, int size)
 {
 	int i;
@@ -41,12 +39,6 @@ void	swap(double *x1, double *x2)
 	*x2 = i;
 }
 
-double	to_radians(double degrees)
-{
-	return (degrees / 180.0 * M_PI);
-}
-
-
 void	create_img(t_img *img_struct, void *img_mlx)
 {
 	int		bit_per_pixel;
@@ -57,4 +49,17 @@ void	create_img(t_img *img_struct, void *img_mlx)
 										&size_line, &endian);
 	img_struct->size_line = size_line;
 	img_struct->img_mlx = img_mlx;
+}
+
+void free_map(int **map)
+{
+	int i;
+
+	i = 0;
+	while (i < (int)mapHeight)
+	{
+		free(map[i]);
+		i++;
+	}
+	free(map);
 }

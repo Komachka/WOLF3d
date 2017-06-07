@@ -1,100 +1,111 @@
 #include "wolf.h"
 
-t_rawcast calc_dist_projection_on_camera_dir(t_rawcast *link_rawcast) {
-    t_rawcast rawcast;
-
-    rawcast = *link_rawcast;
-    if (rawcast.side_c == 1 || rawcast.side_c == 2)
-        rawcast.perpWallDist = (rawcast.mapX - rawcast.rayPosX + (1 - rawcast.stepX) / 2) / rawcast.rayDirX;
-    else
-        rawcast.perpWallDist = (rawcast.mapY - rawcast.rayPosY + (1 - rawcast.stepY) / 2) / rawcast.rayDirY;
-    return rawcast;
-}
-
-t_rawcast calc_base_param_rawcast(t_params *params, t_rawcast *link_rawcast, int x) {
-    double cameraX;
-    t_rawcast rawcast;
-
-    rawcast = *link_rawcast;
-    cameraX = 2 * x / (double) SCREN_WIGHT - 1; //x-coordinate in camera space
-    rawcast.rayPosX = params->posX;
-    rawcast.rayPosY = params->posY;
-    rawcast.rayDirX = params->dirX + params->planeX * cameraX;
-    rawcast.rayDirY = params->dirY + params->planeY * cameraX;
-    rawcast.mapX = (int) rawcast.rayPosX;
-    rawcast.mapY = (int) rawcast.rayPosY;
-    rawcast.deltaDistX = sqrt(1 + (rawcast.rayDirY * rawcast.rayDirY) / (rawcast.rayDirX * rawcast.rayDirX));
-    rawcast.deltaDistY = sqrt(1 + (rawcast.rayDirX * rawcast.rayDirX) / (rawcast.rayDirY * rawcast.rayDirY));
-    return (rawcast);
-}
-
-t_rawcast perform_dda(t_rawcast *link_rawcast, int **world_map)
+t_rawcast   calc_dist_projection_on_camera_dir(t_rawcast *link_rc)
 {
-    t_rawcast rawcast;
-    int hit;
+    t_rawcast   rc;
 
-    rawcast = *link_rawcast;
+    rc = *link_rc;
+    if (rc.side_c == 1 || rc.side_c == 2)
+        rc.perp_wall = (rc.map_x - rc.ray_p_x +
+                (1 - rc.step_x) / 2) / rc.ray_d_x;
+    else
+        rc.perp_wall = (rc.map_y - rc.ray_p_y +
+                (1 - rc.step_y) / 2) / rc.ray_d_y;
+    return rc;
+}
+
+/*
+** cameraX - x-coordinate in camera space
+*/
+
+t_rawcast   calc_par_rc(t_params *pr, t_rawcast *link_rc, int x)
+{
+    double      cameraX;
+    t_rawcast   rc;
+
+    rc = *link_rc;
+    cameraX = 2 * x / (double) SCREN_WIGHT - 1;
+    rc.ray_p_x = pr->pos_x;
+    rc.ray_p_y = pr->pos_y;
+    rc.ray_d_x = pr->dir_x + pr->plane_x * cameraX;
+    rc.ray_d_y = pr->dir_y + pr->plane_y * cameraX;
+    rc.map_x = (int) rc.ray_p_x;
+    rc.map_y = (int) rc.ray_p_y;
+    rc.d_dist_x = sqrt(1 + (rc.ray_d_y * rc.ray_d_y) /
+                                   (rc.ray_d_x * rc.ray_d_x));
+    rc.d_dist_y = sqrt(1 + (rc.ray_d_x * rc.ray_d_x) /
+                                   (rc.ray_d_y * rc.ray_d_y));
+    return (rc);
+}
+
+t_rawcast   perform_dda(t_rawcast *l_rc, int **map)
+{
+    t_rawcast   rc;
+    int         hit;
+
+    rc = *l_rc;
     hit = 0;
     while (hit == 0)
     {
-        if (rawcast.sideDistX < rawcast.sideDistY)
+        if (rc.side_dist_x < rc.side_dist_y)
         {
-            rawcast.sideDistX += rawcast.deltaDistX;
-            rawcast.mapX += rawcast.stepX;
-            rawcast.side_c = (rawcast.stepX > 0) ? NORTH : EAST;
+            rc.side_dist_x += rc.d_dist_x;
+            rc.map_x += rc.step_x;
+            rc.side_c = (rc.step_x > 0) ? NORTH : EAST;
         }
         else
         {
-            rawcast.sideDistY += rawcast.deltaDistY;
-            rawcast.mapY += rawcast.stepY;
-            rawcast.side_c = (rawcast.stepY > 0) ? SOUTH :WEST;
+            rc.side_dist_y += rc.d_dist_y;
+            rc.map_y += rc.step_y;
+            rc.side_c = (rc.step_y > 0) ? SOUTH :WEST;
         }
-        if (world_map[rawcast.mapX][rawcast.mapY] > 0)
+        if (map[rc.map_x][rc.map_y] > 0)
             hit = 1;
     }
-    return (rawcast);
+    return (rc);
 }
 
-t_rawcast calc_step_and_side_dist(t_rawcast *link_rawcast)
+t_rawcast   calc_step_and_side_dist(t_rawcast *link_rc)
 {
-    t_rawcast rawcast;
+    t_rawcast   rc;
 
-    rawcast = *link_rawcast;
-    if (rawcast.rayDirX < 0)
+    rc = *link_rc;
+    if (rc.ray_d_x < 0)
     {
-        rawcast.stepX = -1;
-        rawcast.sideDistX = (rawcast.rayPosX - rawcast.mapX) * rawcast.deltaDistX;
+        rc.step_x = -1;
+        rc.side_dist_x = (rc.ray_p_x - rc.map_x) * rc.d_dist_x;
     }
     else
     {
-        rawcast.stepX = 1;
-        rawcast.sideDistX = (rawcast.mapX + 1.0 - rawcast.rayPosX) * rawcast.deltaDistX;
+        rc.step_x = 1;
+        rc.side_dist_x = (rc.map_x + 1.0 - rc.ray_p_x) * rc.d_dist_x;
     }
-    if (rawcast.rayDirY < 0)
+    if (rc.ray_d_y < 0)
     {
-        rawcast.stepY = -1;
-        rawcast.sideDistY = (rawcast.rayPosY - rawcast.mapY) * rawcast.deltaDistY;
+        rc.step_y = -1;
+        rc.side_dist_y = (rc.ray_p_y - rc.map_y) * rc.d_dist_y;
     }
     else
     {
-        rawcast.stepY = 1;
-        rawcast.sideDistY = (rawcast.mapY + 1.0 - rawcast.rayPosY) * rawcast.deltaDistY;
+        rc.step_y = 1;
+        rc.side_dist_y = (rc.map_y + 1.0 - rc.ray_p_y) * rc.d_dist_y;
     }
-    return (rawcast);
+    return (rc);
 }
 
-t_start_end_draw calc_start_and_end(double perp_wall_dist) {
-    t_start_end_draw result;
-    int lineHeight;
+t_start_end_draw    calc_start_and_end(double perp_wall_dist)
+{
+    t_start_end_draw    result;
+    int                 lineHeight;
 
     lineHeight = (int) ((int)SCREN_HEIGHT / perp_wall_dist);
     if (perp_wall_dist == 0)
         lineHeight = 99999999;
-    result.drawStart = -lineHeight / 2 + SCREN_HEIGHT / 2;
-    if (result.drawStart < 0)
-        result.drawStart = 0;
-    result.drawEnd = lineHeight / 2 + SCREN_HEIGHT / 2;
-    if (result.drawEnd >= SCREN_HEIGHT)
-        result.drawEnd = SCREN_HEIGHT - 1;
+    result.start_point = -lineHeight / 2 + SCREN_HEIGHT / 2;
+    if (result.start_point < 0)
+        result.start_point = 0;
+    result.end_point = lineHeight / 2 + SCREN_HEIGHT / 2;
+    if (result.end_point >= SCREN_HEIGHT)
+        result.end_point = SCREN_HEIGHT - 1;
     return (result);
 }

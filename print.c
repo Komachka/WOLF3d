@@ -32,6 +32,7 @@ void			make_img_line(t_point *p1, t_point *p2, t_img *imege)
 	}
 	print_img_line(ps, imege, 0, 0);
 	del_arrey((void **)ps->rgb, 2);
+    free(ps);
 }
 
 t_print_struct	*create_print_stuff(t_point *p1, t_point *p2)
@@ -76,6 +77,7 @@ void			print_img_line(t_print_struct *p_s, t_img *img, float t, int x)
 		put_pixel_to_image(point, img);
 		x++;
 	}
+    free(point);
 	del_arrey((void **)matrix_colour, 3);
 }
 
