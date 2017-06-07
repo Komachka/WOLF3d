@@ -3,66 +3,9 @@
 //
 
 #include "wolf.h"
-#include "../minilibx/mlx.h"
 
 
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <string.h>
-#include <fcntl.h>
 
-typedef struct s_params
-{
-    void *mlx;
-    t_img *img;
-    void *w;
-
-    double dirX;
-    double dirY;
-    double rotSpeed;
-    double planeX;
-    double planeY;
-    double moveSpeed;
-    double posX;
-    double posY;
-    int **world_map;
-
-}t_params;
-/*
-
-int worldMap[mapWidth][mapHeight] =
-        {
-                {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-                {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-                {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-                {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-                {1,0,0,0,0,0,1,1,1,1,1,0,0,0,0,1,0,1,0,1,0,0,0,1},
-                {1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1},
-                {1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,1,0,0,0,1},
-                {1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1},
-                {1,0,0,0,0,0,1,1,0,1,1,0,0,0,0,1,0,1,0,1,0,0,0,1},//
-                {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},//
-                {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-                {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-                {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-                {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-                {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-                {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-                {1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-                {1,1,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-                {1,1,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-                {1,1,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-                {1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-                {1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-                {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-        };
-*/
-
-
-void *mlx;
-void *window;
-//void verLine(int x, int start, int anEnd, int color);
 int my_key_funk(int keykode, t_params *params);
 
 void draw(t_params *params);
@@ -72,93 +15,66 @@ void draw_flor(t_params *params);
 void verLine(t_vline vline, t_img *img);
 
 
-void create_map(t_params *pParams);
-
+void create_base_params(t_params *params);
 
 int main(void)
 {
 
     t_params *params;
-    params = (t_params*)malloc(sizeof(t_params));
-    //double posX = 22, posY = 12;  //x and y start position
-    double posX = 20, posY = 12;  //x and y start position
-    double dirX = -1, dirY = 0; //initial direction vector
-    double planeX = 0, planeY = 0.66; //the 2d raycaster version of camera plane
-
-
-    create_map(params);
-
-    mlx = mlx_init();
-    window = mlx_new_window(mlx, SCREN_WIGHT, SCREN_HEIGHT, "WOLF3D");
-    t_img *img_stuct;
-    img_stuct = (t_img*)malloc(sizeof(t_img));
     void *img_mlx;
+    void *mlx;
+    void *window;
+
+    params = (t_params*)malloc(sizeof(t_params));
+    create_map(params);
+    create_base_params(params);
+    mlx = mlx_init();
+    params->mlx = mlx;
+    window = mlx_new_window(mlx, SCREN_WIGHT, SCREN_HEIGHT, "WOLF3D");
+    params->window = window;
     img_mlx = mlx_new_image(mlx, SCREN_WIGHT, SCREN_HEIGHT);
-    create_img(img_stuct, img_mlx);
-
-
-    params->posX = posX;
-    params->posY = posY;
-    params->planeX = planeX;
-    params->planeY = planeY;
-    params->dirX = dirX;
-    params->dirY = dirY;
-
-    params->img= img_stuct;
+    create_img(params->img_struct, img_mlx);
     draw_flor(params);
     draw(params);
-
-   mlx_put_image_to_window(mlx, window, img_mlx, 0, 0);
-
+    mlx_put_image_to_window(mlx, window, img_mlx, 0, 0);
     mlx_key_hook(window, my_key_funk, params);
     mlx_loop(mlx);
+    free(params->world_map); // неправильно фришу нужно написать отдельную функцию
+    free(params->img_struct);
+    free(params);
     return (0);
 }
 
-void create_map(t_params *pParams)
+/*
+**	posX, posY - x and y start position
+**  dirX, dir Y - initial direction vector
+**  planeX, plane Y - the 2d raycaster version of camera plane
+*/
+
+void create_base_params(t_params *params)
 {
-    int i = 0;
-    int j;
-    pParams->world_map = (int **)malloc(sizeof(int *) * mapHeight);
-    while (i < (int)mapHeight)
-    {
-        pParams->world_map[i] = (int*)malloc(sizeof(int) * mapWidth);
-        j = 0;
-        while(j < (int)mapWidth)
-        {
-            if(i == 0 || j == 0 || i == mapWidth - 1 || j == mapHeight - 1)
-                pParams->world_map[i][j] = 1;
-            else
-                pParams->world_map[i][j] = 0;
-            if (i * j == 5 || i * j ==  8 || i * j ==  13 || i * j == 21 || i * j == 34|| i * j == 55||
-                    i * j == 89 || i * j ==  144 || i * j == 233 || i * j ==  377)
-                pParams->world_map[i][j] = 1;
-            if ((i == 5 && j != 1) || (i == 5 && j != 2) || (i == 5 && j != 3) || ( i == 5 && j != 4) || ( i == 5 && j != 5))
-            pParams->world_map[i][j] = 1;
-            if (i%2 == 0 && j < mapWidth/2)
-                pParams->world_map[i][j] = 1;
-            j++;
-        }
-        i++;
-    }
+    t_img *img_stuct;
 
-
+    img_stuct = (t_img*)malloc(sizeof(t_img));
+    params->img_struct= img_stuct;
+    params->posX = 20;
+    params->posY = 12;
+    params->planeX = 0;
+    params->planeY = 0.66;
+    params->dirX = -1;
+    params->dirY = 0;
 }
 
 
 void draw_flor(t_params *params)
 {
-    int i;
-
-
-    /*double cameraX = 2 * x / (double) SCREN_WIGHT - 1; //x-coordinate in camera space
-    double rayDirY = params->dirY + params->planeY * cameraX;
-    */
+    int     i;
     t_point *p;
+    int     y;
 
     p = (t_point*)malloc(sizeof(t_point));
     i = SCREN_HEIGHT/2;
-    int y = 0;
+    y = 0;
     while (i < SCREN_HEIGHT)
     {
         y = 0;
@@ -166,9 +82,7 @@ void draw_flor(t_params *params)
             p->x = y;
             p->y = i;
             p->colour = 0x707270;
-
-            put_pixel_to_image(p, params->img);
-            //mlx_pixel_put(mlx, window, y, i, 0x707270);
+            put_pixel_to_image(p, params->img_struct);
             y++;
         }
         i++;
@@ -178,11 +92,12 @@ void draw_flor(t_params *params)
 
 void draw(t_params *params)
 {
-    int **worldMap = params->world_map;
+    int **worldMap;
 
-
-    double time = 0; //time of current frame
-    double oldTime = 0; //time of previous frame
+    worldMap = params->world_map;
+    double time; //time of current frame
+    double oldTime; //time of previous frame
+    time = 0;
     for (int x = 0; x < SCREN_WIGHT; x++) {
         //calculate ray position and direction
         double cameraX = 2 * x / (double) SCREN_WIGHT - 1; //x-coordinate in camera space
@@ -210,32 +125,28 @@ void draw(t_params *params)
 
         int hit = 0; //was there a wall hit?
         int side; //was a NS or a EW wall hit?
+
         //calculate step and initial sideDist
 
-
-        int side_c = 0;
         if (rayDirX < 0) {
             stepX = -1;
             sideDistX = (rayPosX - mapX) * deltaDistX;
-            //side_c = 1;
         } else {
             stepX = 1;
             sideDistX = (mapX + 1.0 - rayPosX) * deltaDistX;
-            //side_c = 2;
         }
         if (rayDirY < 0) {
             stepY = -1;
             sideDistY = (rayPosY - mapY) * deltaDistY;
-            //side_c = 3;
         } else {
             stepY = 1;
             sideDistY = (mapY + 1.0 - rayPosY) * deltaDistY;
-            //side_c = 4;
         }
         //perform DDA
 
-        side_c = 0;
-        while (hit == 0) {
+        int side_c = 0;
+        while (hit == 0)
+        {
             //jump to next map square, OR in x-direction, OR in y-direction
             if (sideDistX < sideDistY) {
                 sideDistX += deltaDistX;
@@ -248,12 +159,10 @@ void draw(t_params *params)
             } else {
                 sideDistY += deltaDistY;
                 mapY += stepY;
-
                 if (stepY > 0)
                     side_c = 3; ////
                 if (stepY < 0)
                     side_c = 4; ////
-
                 side = 1;
             }
             //Check if ray has hit a wall
@@ -280,48 +189,9 @@ void draw(t_params *params)
 
         //choose wall color
 
+
         int color;
-        //printf("mapX == %d mapY = %d\n", mapX, mapY);
-        //printf("worldmap[x][y] = %d\n",worldMap[mapX][mapY]);
-        switch (worldMap[mapX][mapY]) {
-            case 1:
-                color = 0xFF0000; //
-                break; //red
-            case 2:
-                color = 0xFFFF00;
-                break; //green
-            case 3:
-                color = 0x0000FF;
-                break; //blue
-            case 4:
-                color = 0xFFFFFF;
-                break; //white
-            default:
-                color = 0xc8b3c6;
-                break; //yellow
-        }
-        //printf("colour1 = %x\n",color);
-        //give x and y sides different brightness
-/*        if (side == 1) {
-            int b = color & 0xFF;
-            int g = color >> 8 & 0xFF;
-            int r = color >> 16 & 0xFF;
-            //    printf("r = %d\n", r);
-            //   printf("g = %d\n", g);
-            //   printf("b = %d\n", b);
-            r /= 2;
-            g /= 2;
-            b /= 2;
-            //  printf("r = %d\n", r);
-            //  printf("g = %d\n", g);
-            // printf("b = %d\n", b);
-            color = r + (g << 8) + (b << 16);
-            //color = color / 2;
-            //printf("colour2 = %x\n\n\n\n\n\n",color);
-        }*/
-        if (side == 1)
-            color = 0x00FFFF;
-        //draw the pixels of the stripe as a vertical line
+
         if (side_c == 1)
             color = 0xFF0000;
         if (side_c == 2)
@@ -335,23 +205,17 @@ void draw(t_params *params)
         line.start = drawStart;
         line.end = drawEnd;
         line.colour = color;
-        verLine(line, params->img);
+        verLine(line, params->img_struct);
         //verLine(x, drawStart, drawEnd, color);
     }
 
     //timing for input and FPS counter
     oldTime = time;
     time = 50;
-    double frameTime = (time - oldTime) / 1000.0; //frameTime is the time this frame has taken, in seconds
-    //print(1.0 / frameTime); //FPS counter
-    //redraw();
-    //cls();
-
+    double frameTime = 50 / 1000.0; //frameTime is the time this frame has taken, in seconds
     //speed modifiers
-    double moveSpeed = frameTime * 5.0; //the constant value is in squares/second
-    double rotSpeed = frameTime * 3.0; //the constant value is in radians/second
-    params->moveSpeed = moveSpeed;
-    params->rotSpeed = rotSpeed;
+    params->moveSpeed = frameTime * 5.0; // //the constant value is in squares/second
+    params->rotSpeed = frameTime * 3.0; //the constant value is in radians/second
 }
 
 void verLine(t_vline vline, t_img *img) {
@@ -366,31 +230,12 @@ void verLine(t_vline vline, t_img *img) {
     p2->x = vline.x;
     p1->y = vline.start;
     p2->y = vline.end;
-
     make_img_line(p1, p2, img);
     free(p1);
     free(p2);
 }
 
-/*void verLine(int x, int start, int anEnd, int color)
-{
-    t_point *p1;
-    t_point *p2;
-    t_img *img_mlx;
 
-    p1 = (t_point*)malloc(sizeof(t_point));
-    p2 = (t_point*)malloc(sizeof(t_point));
-    p1->colour =color;
-    p2->colour =color;
-    p1->x = x;
-    p2->x = x;
-    p1->y = start;
-    p2->y = anEnd;
-
-    make_img_line(p1, p2, img_mlx);
-    free(p1);
-    free(p2);
-}*/
 
 int my_key_funk(int keykode, t_params *params)
 {
@@ -407,13 +252,13 @@ int my_key_funk(int keykode, t_params *params)
         params->planeY = oldPlaneX * sin(-params->rotSpeed) + params->planeY * cos(-params->rotSpeed);
 
         //mlx_clear_window(mlx, window);
-        mlx_destroy_image(mlx, params->img->img_mlx);
-        void *img_mlx = mlx_new_image(mlx, SCREN_WIGHT, SCREN_HEIGHT);
-        params->img->img_mlx = img_mlx;
-        create_img(params->img, params->img->img_mlx);
+        mlx_destroy_image(params->mlx, params->img_struct->img_mlx);
+        void *img_mlx = mlx_new_image(params->mlx, SCREN_WIGHT, SCREN_HEIGHT);
+        params->img_struct->img_mlx = img_mlx;
+        create_img(params->img_struct, params->img_struct->img_mlx);
         draw_flor(params);
         draw(params);
-        mlx_put_image_to_window(mlx, window, img_mlx, 0, 0);
+        mlx_put_image_to_window(params->mlx, params->window, img_mlx, 0, 0);
     }
     if (keykode == LEFT)
     {
@@ -424,12 +269,12 @@ int my_key_funk(int keykode, t_params *params)
         params->planeX = params->planeX * cos(params->rotSpeed) - params->planeY * sin(params->rotSpeed);
         params->planeY = oldPlaneX * sin(params->rotSpeed) + params->planeY * cos(params->rotSpeed);
 
-        mlx_destroy_image(mlx, params->img->img_mlx);
-        params->img->img_mlx = mlx_new_image(mlx, SCREN_WIGHT, SCREN_HEIGHT);
-        create_img(params->img, params->img->img_mlx);
+        mlx_destroy_image(params->mlx, params->img_struct->img_mlx);
+        params->img_struct->img_mlx = mlx_new_image(params->mlx, SCREN_WIGHT, SCREN_HEIGHT);
+        create_img(params->img_struct, params->img_struct->img_mlx);
         draw_flor(params);
         draw(params);
-        mlx_put_image_to_window(mlx, window, params->img->img_mlx, 0, 0);
+        mlx_put_image_to_window(params->mlx, params->window, params->img_struct->img_mlx, 0, 0);
 
 
         //mlx_clear_window(mlx, window);
@@ -446,12 +291,12 @@ int my_key_funk(int keykode, t_params *params)
             params->posY += params->dirY * params->moveSpeed;
 
 
-        mlx_destroy_image(mlx, params->img->img_mlx);
-        params->img->img_mlx = mlx_new_image(mlx, SCREN_WIGHT, SCREN_HEIGHT);
-        create_img(params->img, params->img->img_mlx);
+        mlx_destroy_image(params->mlx, params->img_struct->img_mlx);
+        params->img_struct->img_mlx = mlx_new_image(params->mlx, SCREN_WIGHT, SCREN_HEIGHT);
+        create_img(params->img_struct, params->img_struct->img_mlx);
         draw_flor(params);
         draw(params);
-        mlx_put_image_to_window(mlx, window, params->img->img_mlx, 0, 0);
+        mlx_put_image_to_window(params->mlx, params->window, params->img_struct->img_mlx, 0, 0);
 
 
         //mlx_clear_window(mlx, window);
@@ -465,12 +310,12 @@ int my_key_funk(int keykode, t_params *params)
         if(worldMap[(int)(params->posX)][(int)(params->posY - params->dirY * params->moveSpeed)] == 0)
             params->posY -= params->dirY * params->moveSpeed;
 
-        mlx_destroy_image(mlx, params->img->img_mlx);
-        params->img->img_mlx = mlx_new_image(mlx, SCREN_WIGHT, SCREN_HEIGHT);
-        create_img(params->img, params->img->img_mlx);
+        mlx_destroy_image(params->mlx, params->img_struct->img_mlx);
+        params->img_struct->img_mlx = mlx_new_image(params->mlx, SCREN_WIGHT, SCREN_HEIGHT);
+        create_img(params->img_struct, params->img_struct->img_mlx);
         draw_flor(params);
         draw(params);
-        mlx_put_image_to_window(mlx, window, params->img->img_mlx, 0, 0);
+        mlx_put_image_to_window(params->mlx, params->window, params->img_struct->img_mlx, 0, 0);
 
         //mlx_clear_window(mlx, window);
         //draw_flor(params);

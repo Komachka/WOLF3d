@@ -10,18 +10,18 @@
 #include <math.h>
 
 
-/*
 #define UP 126
 #define DOWN 125
 #define RIGHT 124
 #define LEFT 123
-*/
 
+/*
 //linux
 #define UP 65362
 #define DOWN 65364
 #define LEFT 65361
 #define RIGHT 65363
+*/
 
 #define mapWidth 24
 #define mapHeight 24
@@ -31,8 +31,32 @@
 //#define SCREN_WIGHT 632 //512
 #define SCREN_HEIGHT 1024 // 384
 //#define SCREN_HEIGHT 504 // 384
-extern void* mlx;
-extern void* window;
+
+typedef struct s_rawcast
+{
+    double cameraX;
+    double rayPosX;
+    double rayPosY;
+    double rayDirX;
+    double rayDirY;
+    int mapX;
+    int mapY;
+    double sideDistX;
+    double sideDistY;
+    double deltaDistX;
+    double deltaDistY;
+    double perpWallDist;
+    int stepX;
+    int stepY;
+    int hit;
+    int side;
+    int side_c;
+    int lineHeight;
+    int drawStart;
+    int drawEnd;
+    int color;
+
+} t_rawcast;
 
 typedef struct s_vline
 {
@@ -74,6 +98,24 @@ typedef struct
     double			b;
 }					t_rgb;
 
+typedef struct s_params
+{
+    void *mlx;
+    t_img *img_struct;
+    void *window;
+
+    double dirX;
+    double dirY;
+    double rotSpeed;
+    double planeX;
+    double planeY;
+    double moveSpeed;
+    double posX;
+    double posY;
+    int **world_map;
+
+}t_params;
+
 /*
 **	print.c
 */
@@ -107,5 +149,10 @@ double				to_radians(double degrees);
 int					what_fractal_is_it(char c);
 void	            create_img(t_img *img_struct, void *img_mlx);
 
+/*
+**	map.c
+*/
+void create_map(t_params *params);
+void mark_map(t_params *params, int i, int j);
 #endif
 
