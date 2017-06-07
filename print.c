@@ -10,9 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
 #include "wolf.h"
-#include <mlx.h>
 
 void			make_img_line(t_point *p1, t_point *p2, t_img *imege)
 {
@@ -94,7 +92,6 @@ int				put_pixel_to_image(t_point *p, t_img *image)
 	map = image->map;
 	size_line = image->size_line;
 	if (p->x >= SCREN_WIGHT || p->y >= SCREN_HEIGHT || p->x < 0 || p->y < 0) {
-		//printf("p->x >= mapWidth || p->y >= mapHeight || p->x < 0 || p->y < 0");
 		return (-1);
 	}
 		k = (int)(ceil(p->y) * size_line + ceil(p->x) * 4);
@@ -107,36 +104,23 @@ int				put_pixel_to_image(t_point *p, t_img *image)
 	map[k] = (unsigned char)(col >> 8 & 0xFF);
 	k++;
 	map[k] = (unsigned char)(col >> 16 & 0xFF);
-	//printf("k = %d\n", k);
 	return (0);
 }
-/*
 
-int				put_pixel_to_image(t_point *p, t_img *image)
+void verLine(t_vline vline, t_img *img)
 {
-	int		col;
-	int		k;
-	char	*map;
-	int		size_line;
+	t_point *p1;
+	t_point *p2;
 
-	image = (t_img*)malloc(sizeof(t_img));
-    //col = 0xFFFF00;
-	mlx_pixel_put(mlx, window, (int)p->x, (int)p->y, p->colour);
-    //map = image->map;
-	//size_line = image->size_line;
-	//if (p->x >= mapWidth || p->y >= mapHeight || p->x < 0 || p->y < 0)
-	//	return (-1);
-	//k = (int)(ceil(p->y) * size_line + ceil(p->x) * 4);
-	//if (k >= mapHeight * size_line * 4 - 1)
-	//	return (-1);
-	//else if (k < 0)
-	//	return (-1);
-	//map[k] = (unsigned char)(col & 0xFF);
-	//k++;
-	//map[k] = (unsigned char)(col >> 8 & 0xFF);
-	//k++;
-	//map[k] = (unsigned char)(col >> 16 & 0xFF);
-	return (0);
+	p1 = (t_point*)malloc(sizeof(t_point));
+	p2 = (t_point*)malloc(sizeof(t_point));
+	p1->colour =vline.colour;
+	p2->colour =vline.colour;
+	p1->x = vline.x;
+	p2->x = vline.x;
+	p1->y = vline.start;
+	p2->y = vline.end;
+	make_img_line(p1, p2, img);
+	free(p1);
+	free(p2);
 }
-
-*/

@@ -14,7 +14,12 @@
 #define DOWN 125
 #define RIGHT 124
 #define LEFT 123
+#define EXIT 53
 
+#define NORTH 1
+#define EAST 2
+#define SOUTH 3
+#define WEST 4
 /*
 //linux
 #define UP 65362
@@ -34,7 +39,7 @@
 
 typedef struct s_rawcast
 {
-    double cameraX;
+
     double rayPosX;
     double rayPosY;
     double rayDirX;
@@ -48,15 +53,16 @@ typedef struct s_rawcast
     double perpWallDist;
     int stepX;
     int stepY;
-    int hit;
-    int side;
     int side_c;
-    int lineHeight;
+} t_rawcast;
+
+
+
+typedef struct s_start_end_draw
+{
     int drawStart;
     int drawEnd;
-    int color;
-
-} t_rawcast;
+}t_start_end_draw;
 
 typedef struct s_vline
 {
@@ -116,6 +122,9 @@ typedef struct s_params
 
 }t_params;
 
+void draw(t_params *params);
+void draw_flor(t_params *params);
+
 /*
 **	print.c
 */
@@ -154,5 +163,6 @@ void	            create_img(t_img *img_struct, void *img_mlx);
 */
 void create_map(t_params *params);
 void mark_map(t_params *params, int i, int j);
+int exit_x(void *par);
 #endif
 
